@@ -24,9 +24,9 @@ for para in family['data']:
             # print(222, answer)
             if ("何时" in question) or ("什么时候" in question) or ("谁" in question) or ("多少" in question) or ("哪里" \
                 in question):
+            # if ("何时" in question):
                 context_2sentence = re.findall(r"[\w']+", context)
                 answer_list = re.findall(r"[\w']+", answer)
-                # print (question, answer,"####",context_2sentence)
                 # 如果原文档中的答案就是一个小分句以上，保持原状
                 for ele_sen in context_2sentence:
                     if len(answer_list) == 1:
@@ -35,11 +35,14 @@ for para in family['data']:
                             # print(111, question, answer, ele_sen)
                             if answer != ele_sen:
                                 count += 1
-                                ans['answers'][0]['text'] = ele_sen
-                                print(question, answer, ele_sen, answer_start_index)
-                            if answer[0] != ele_sen[0]:
-                                ans['answers'][0]['answer_start'] = answer_start_index
-                                print ("start no same")
+                                # answer是"1996年",全部改为将整句取出；但同样的"1996年“可能全文多处出现，根据answer_start定位
+                                if abs(ans['answers'][0]['answer_start']-answer_start_index) <=20:
+                                # print (abs(ans['answers'][0]['answer_start']-answer_start_index))
+                                    ans['answers'][0]['text'] = ele_sen
+                                    # print(question, answer, ele_sen, answer_start_index)
+                                    if answer[0] != ele_sen[0]:
+                                        ans['answers'][0]['answer_start'] = answer_start_index
+                                        # print ("start no same")
 
 print (ind, count)
 file_out.write(json.dumps(family, ensure_ascii=False))
